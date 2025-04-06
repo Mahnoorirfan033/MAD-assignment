@@ -1,0 +1,172 @@
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  SectionList,
+  TextInput,
+  TouchableOpacity,
+  Modal,
+  StyleSheet,
+} from 'react-native';
+
+const contacts = [
+  { name: 'amna', number: '1234567890', group: 'Family' },
+  { name: 'maina', number: '2345678901', group: 'Friends' },
+  { name: 'ali', number: '3456789012', group: 'Work' },
+  { name: 'noor', number: '4567890123', group: 'Family' },
+  { name: 'gul', number: '5678901234', group: 'Friends' },
+  { name: 'ahmed', number: '6789012345', group: 'Work' },
+  { name: 'hani', number: '7890123456', group: 'Family' },
+  { name: 'naima', number: '8901234567', group: 'Friends' },
+  { name: 'nimra', number: '9012345678', group: 'Work' },
+  { name: 'sunny', number: '0123456789', group: 'Family' },
+];
+
+const groupContacts = (data) => {
+  const groups = ['Family', 'Friends', 'Work'];
+  return groups.map(group => ({
+    title: group,
+    data: data.filter(contact => contact.group === group),
+  }));
+};
+
+export default function App() {
+  const [search, setSearch] = useState('');
+  const [selectedContact, setSelectedContact] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const filteredContacts = contacts.filter(
+    c =>
+      c.name.toLowerCase().includes(search.toLowerCase()) ||
+      c.number.includes(search)
+  );
+
+  const sections = groupContacts(filteredContacts);
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.header}>📇 Contacts</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Search by name or number"
+        placeholderTextColor="#aac"
+        value={search}
+        onChangeText={setSearch}
+      />
+      <SectionList
+        sections={sections}
+        keyExtractor={(item, index) => item.name + index}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={styles.item}
+            onPress={() => {
+              setSelectedContact(item);
+              setModalVisible(true);
+            }}
+          >
+            <Text style={styles.name}>{item.name}</Text>
+            <Text style={styles.number}>{item.number}</Text>
+          </TouchableOpacity>
+        )}
+        renderSectionHeader={({ section: { title } }) => (
+          <Text style={styles.sectionHeader}>{title}</Text>
+        )}
+      />
+
+      <Modal visible={modalVisible} transparent animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Contact Details</Text>
+            {selectedContact && (
+              <>
+                <Text>Name: {selectedContact.name}</Text>
+                <Text>Number: {selectedContact.number}</Text>
+                <Text>Group: {selectedContact.group}</Text>
+              </>
+            )}
+            <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeBtn}>
+              <Text style={styles.closeBtnText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#e6f0ff',
+    padding: 16,
+  },
+  header: {
+    fontSize: 24,
+    color: '#004aad',
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  input: {
+    backgroundColor: '#cce0ff',
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 10,
+    color: '#002244',
+  },
+  sectionHeader: {
+    fontSize: 18,
+    backgroundColor: '#004aad',
+    color: '#fff',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+    marginTop: 10,
+  },
+  item: {
+    backgroundColor: '#f2f6ff',
+    padding: 10,
+    marginVertical: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#aaccee',
+  },
+  name: {
+    fontSize: 16,
+    color: '#003366',
+  },
+  number: {
+    fontSize: 14,
+    color: '#555',
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: '#00000088',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#ffffff',
+    padding: 20,
+    borderRadius: 12,
+    width: '80%',
+    shadowColor: '#000',
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+  },
+  modalTitle: {
+    fontSize: 20,
+    marginBottom: 10,
+    color: '#004aad',
+    fontWeight: 'bold',
+  },
+  closeBtn: {
+    marginTop: 15,
+    backgroundColor: '#004aad',
+    padding: 10,
+    borderRadius: 6,
+  },
+  closeBtnText: {
+    color: '#fff',
+    textAlign: 'center',
+  },
+});
